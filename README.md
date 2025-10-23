@@ -50,7 +50,8 @@ go get github.com/pelletier/go-toml/v2
 go mod tidy
 
 # Build
-go build -o agepad
+mkdir -p bin
+go build -o bin/agepad
 ```
 
 ### Install to PATH
@@ -83,13 +84,13 @@ age-keygen -y ~/.config/age/key.txt > .age-recipients
 Edit an encrypted file:
 
 ```bash
-./agepad --file secrets/app.env.age --recipients-file .age-recipients
+bin/agepad --file secrets/app.env.age --recipients-file .age-recipients
 ```
 
 View-only mode (no editing):
 
 ```bash
-./agepad --file secrets/app.env.age --recipients-file .age-recipients --view
+bin/agepad --file secrets/app.env.age --recipients-file .age-recipients --view
 ```
 
 #### TUI Keyboard Shortcuts
@@ -104,7 +105,7 @@ View-only mode (no editing):
 Re-encrypt all `.age` files in a directory tree with new recipients:
 
 ```bash
-./agepad rotate \
+bin/agepad rotate \
   --root secrets \
   --from .age-recipients \
   --to .age-recipients.new \
@@ -118,7 +119,7 @@ This decrypts each file with your current identity and re-encrypts with the new 
 Run a command with environment variables from an encrypted file (no temp files created):
 
 ```bash
-./agepad run -- secrets/app.env.age -- myserver --port 8080
+bin/agepad run -- secrets/app.env.age -- myserver --port 8080
 ```
 
 The decrypted KEY=VALUE pairs are injected directly into the command's environment.
@@ -165,7 +166,7 @@ age-keygen -y ~/.config/age/key.txt > .age-recipients
 echo "API_KEY=secret123" | age -r $(cat .age-recipients) -a -o secrets/app.env.age
 
 # 4. Edit it securely
-./agepad --file secrets/app.env.age
+bin/agepad --file secrets/app.env.age
 ```
 
 ### Team Collaboration
@@ -184,7 +185,7 @@ git add .age-recipients
 git commit -m "Add team AGE recipients"
 
 # Now anyone with their private key can edit
-./agepad --file secrets/app.env.age
+bin/agepad --file secrets/app.env.age
 ```
 
 ### Key Rotation
@@ -197,7 +198,7 @@ age-keygen --output ~/.config/age/key-new.txt
 age-keygen -y ~/.config/age/key-new.txt > .age-recipients.new
 
 # Rotate all secrets
-./agepad rotate --root secrets --to .age-recipients.new
+bin/agepad rotate --root secrets --to .age-recipients.new
 
 # Move new key to default location
 mv ~/.config/age/key-new.txt ~/.config/age/key.txt
@@ -208,10 +209,10 @@ mv .age-recipients.new .age-recipients
 
 ```bash
 # In CI, inject secrets without temp files
-./agepad run -- config/prod.env.age -- ./deploy.sh
+bin/agepad run -- config/prod.env.age -- ./deploy.sh
 
 # Or decrypt for inspection (read-only)
-./agepad --file config/prod.env.age --view
+bin/agepad --file config/prod.env.age --view
 ```
 
 ## File Format Support
