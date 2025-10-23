@@ -21,15 +21,17 @@ deps:
 
 # Build the binary
 build:
-    go build -o agepad
+    mkdir -p bin
+    go build -o bin/agepad
 
 # Build with optimizations (smaller binary)
 build-release:
-    go build -ldflags="-s -w" -o agepad
+    mkdir -p bin
+    go build -ldflags="-s -w" -o bin/agepad
 
 # Clean build artifacts
 clean:
-    rm -f agepad
+    rm -rf bin
 
 # Full setup: init, deps, and build
 all: init deps build
@@ -55,4 +57,5 @@ check: fmt vet test
 
 # Development build (with race detector)
 build-dev:
-    go build -race -o agepad
+    mkdir -p bin
+    go build -race -o bin/agepad
