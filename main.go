@@ -53,6 +53,7 @@ import (
 	"time"
 
 	"filippo.io/age"
+	"filippo.io/age/armor"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pelletier/go-toml/v2"
@@ -213,13 +214,10 @@ func decryptToMemory(cipherPath string, ids []age.Identity) (string, error) {
 	return string(plain), nil
 }
 
-func encryptToMemory(plaintext []byte, recips []age.Recipient, armor bool) ([]byte, error) {
+func encryptToMemory(plaintext []byte, recips []age.Recipient, armorFlag bool) ([]byte, error) {
 	var buf bytes.Buffer
-	if armor {
-		aw, err := age.Armor(&buf)
-		if err != nil {
-			return nil, err
-		}
+	if armorFlag {
+		aw := armor.NewWriter(&buf)
 		w, err := age.Encrypt(aw, recips...)
 		if err != nil {
 			return nil, err
@@ -248,7 +246,7 @@ func encryptToMemory(plaintext []byte, recips []age.Recipient, armor bool) ([]by
 	return buf.Bytes(), nil
 }
 
-func atomicEncryptWrite(dstPath string, b []byte, recips []age.Recipient, armor bool) error {
+func atomicEncryptWrite(dstPath string, b []byte, recips []age.Recipient, armorFlag bool) error {
 	dir := filepath.Dir(dstPath)
 	tmp, err := os.CreateTemp(dir, ".agepad-tmp-*")
 	if err != nil {
@@ -257,11 +255,8 @@ func atomicEncryptWrite(dstPath string, b []byte, recips []age.Recipient, armor 
 	tmpPath := tmp.Name()
 	defer func() { _ = os.Remove(tmpPath) }()
 
-	if armor {
-		aw, err := age.Armor(tmp)
-		if err != nil {
-			return fmt.Errorf("armor: %w", err)
-		}
+	if armorFlag {
+		aw := armor.NewWriter(tmp)
 		w, err := age.Encrypt(aw, recips...)
 		if err != nil {
 			return fmt.Errorf("encrypt: %w", err)
